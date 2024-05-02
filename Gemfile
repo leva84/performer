@@ -29,6 +29,7 @@ group :development, :test do
   gem 'factory_bot_rails'
   gem 'faker'
   gem 'pry'
+  gem 'rspec-rails', '~> 6.1.0'
 end
 
 group :development do
@@ -41,7 +42,6 @@ end
 group :test do
   gem 'capybara'
   gem 'rails-controller-testing'
-  gem 'rspec-rails', '~> 6.0'
   gem 'selenium-webdriver'
   gem 'shoulda-matchers'
 end
