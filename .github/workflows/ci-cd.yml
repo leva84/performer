@@ -71,7 +71,7 @@ jobs:
           DATABASE_URL: postgres://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}
         run: |
           bin/rails db:create
-          bin/rails db:schema:load
+          bin/rails db:migrate
           bin/rails db:seed
 
       - name: Run tests
