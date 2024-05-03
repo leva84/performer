@@ -58,4 +58,4 @@ jobs:
         run: docker-compose -f docker-compose.yml up -d
 
       - name: Run tests
-        run: docker-compose -f docker-compose.yml run --rm test bin/rails --verbose db:create db:migrate db:seed
+        run: docker-compose -f docker-compose.yml run --rm test sh -c "bin/rails --verbose db:create db:migrate db:seed && bundle exec rspec"
