@@ -1,0 +1,61 @@
+name: tasks
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - develop
+      - main
+    types: [closed]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Copy database configuration
+        run: cp config/database.example.yml config/database.yml
+
+      - name: Set up Docker Compose
+        run: docker-compose -f docker-compose.yml up -d
+
+      - name: Setup database
+        run: docker-compose -f docker-compose.yml run --rm app bin/rails --verbose db:create db:migrate db:seed
+
+  lint:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Ruby with rbenv
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3.1
+
+      - name: Install RuboCop
+        run: sudo gem install rubocop
+
+      - name: Run RuboCop
+        run: rubocop
+
+  test:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Copy database configuration
+        run: cp config/database.example.yml config/database.yml
+
+      - name: Set up Docker Compose
+        run: docker-compose -f docker-compose.yml up -d
+
+      - name: Run tests
+        run: docker-compose -f docker-compose.yml run --rm test sh -c "bin/rails --verbose db:create db:migrate db:seed && bundle exec rspec"
