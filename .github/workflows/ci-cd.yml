@@ -9,75 +9,53 @@ on:
       - main
     types: [closed]
 
-env:
-  DB_NAME: DB_NAME
-  DB_USER: DB_USER
-  DB_PASSWORD: DB_PASSWORD
-  DATABASE_URL: postgres://DB_USER:DB_PASSWORD@localhost:5432/DB_NAME
-
 jobs:
-  task:
-    strategy:
-      matrix:
-        job: [build, lint, test]
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:14
-        env:
-          POSTGRES_USER: ${{ env.DB_USER }}
-          POSTGRES_PASSWORD: ${{ env.DB_PASSWORD }}
-          POSTGRES_DB: ${{ env.DB_NAME }}
-        ports: [ "5432:5432" ]
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+  build:
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Ruby
+      - name: Copy database configuration
+        run: cp config/database.example.yml config/database.yml
+
+      - name: Set up Docker Compose
+        run: docker-compose -f docker-compose.yml up -d
+
+      - name: Setup database
+        run: docker-compose -f docker-compose.yml run --rm app bin/rails --verbose db:create db:migrate db:seed
+
+  lint:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Ruby with rbenv
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.3.1
 
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
-
-      - name: Install dependencies
-        if: matrix.job == 'build' || matrix.job == 'test'
-        run: |
-          sudo apt-get -yqq install libpq-dev postgresql-client netcat imagemagick
-          gem install bundler
-          bundle config path vendor/bundle
-          bundle install --jobs 4 --retry 3
-          cp config/database.example.yml config/database.yml
-
       - name: Install RuboCop
-        if: matrix.job == 'lint'
-        run: gem install rubocop
+        run: sudo gem install rubocop
 
-      - name: Run linters
-        if: matrix.job == 'lint'
+      - name: Run RuboCop
         run: rubocop
 
-      - name: Setup test database
-        if: matrix.job == 'test'
-        env:
-          RAILS_ENV: test
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-        run: |
-          bin/rails db:create
-          bin/rails db:migrate
-          bin/rails db:seed
+  test:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Copy database configuration
+        run: cp config/database.example.yml config/database.yml
+
+      - name: Set up Docker Compose
+        run: docker-compose -f docker-compose.yml up -d
 
       - name: Run tests
-        if: matrix.job == 'test'
-        env:
-          RAILS_ENV: test
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-        run: bundle exec rspec
+        run: docker-compose -f docker-compose.yml run --rm test bin/rails --verbose db:create db:migrate db:seed

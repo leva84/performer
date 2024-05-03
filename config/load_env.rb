@@ -10,5 +10,5 @@ if File.exist?(env_file_path)
     ENV[key] = value
   end
 else
-  puts 'Файл с переменными окружения (.env) не найден'
+  puts 'Environment variable (.env) file not found'
 end
