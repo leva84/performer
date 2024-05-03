@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 env_file_path = File.expand_path('../.env', __dir__)
 
 if File.exist?(env_file_path)
