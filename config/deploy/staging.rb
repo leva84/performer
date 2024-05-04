@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+set :stage, :staging
+set :branch, 'staging'
+set :deploy_to, 'http://localhost'
+
 # server-based syntax
 # ======================
 # Defines a single server with a list of roles and multiple properties.
