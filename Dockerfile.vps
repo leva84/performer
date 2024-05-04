@@ -21,12 +21,6 @@ RUN mkdir -p /home/deploy/.ssh && \
     chmod 700 /home/deploy/.ssh && \
     chmod 600 /home/deploy/.ssh/*
 
-# Копирование локального публичного ключа в контейнер
-COPY ./.ssh/id_rsa.pub /home/deploy/.ssh/authorized_keys
-#
-# # Отключение аутентификации по паролю в SSH
-# RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
-
 # Создание каталога для привилегий SSH
 RUN mkdir -p /var/run/sshd
 
