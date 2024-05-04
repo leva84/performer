@@ -20,9 +20,6 @@ jobs:
       - name: Copy database configuration
         run: cp config/database.example.yml config/database.yml
 
-      - name: Set up Docker Compose
-        run: docker-compose -f docker-compose.yml up -d
-
       - name: Setup database
         run: docker-compose -f docker-compose.yml run --rm app bin/rails --verbose db:create db:migrate db:seed
 
@@ -53,9 +50,6 @@ jobs:
 
       - name: Copy database configuration
         run: cp config/database.example.yml config/database.yml
-
-      - name: Set up Docker Compose
-        run: docker-compose -f docker-compose.yml up -d
 
       - name: Run tests
         run: docker-compose -f docker-compose.yml run --rm test sh -c "bin/rails --verbose db:create db:migrate db:seed && bundle exec rspec"
