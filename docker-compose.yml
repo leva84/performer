@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     command: rails s -p 3000 -b '0.0.0.0'
     ports:
       - "3000:3000"
@@ -32,3 +34,12 @@ services:
       - postgres
     environment:
       RAILS_ENV: test
+
+  vps:
+    build:
+      context: .
+      dockerfile: Dockerfile.vps
+    ports:
+      - '80:80'
+      - '443:443'
+      - '22:22'
