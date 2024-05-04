@@ -21,6 +21,7 @@ Things you may want to cover:
 
 ### Deployment instructions
   1. Deploy to staging
+     Preparing a VPS and access via ssh to it
      - ssh-keygen -t rsa -b 4096 -C "email@example.com" -f /path/to/project/.ssh/id_rsa
      - docker-compose up vps -d
      - ssh-add .ssh/id_rsa
