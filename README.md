@@ -19,6 +19,13 @@ Things you may want to cover:
 
 * Services (job queues, cache servers, search engines, etc.)
 
-* Deployment instructions
-
+### Deployment instructions
+  1. Deploy to staging
+     Preparing a VPS and access via ssh to it
+     - docker-compose up vps -d
+     - ssh-add
+     - ssh-add -l
+     - ssh-copy-id deploy@0.0.0.0
+     - ssh deploy@0.0.0.0
+  2. ...
 * ...

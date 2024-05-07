@@ -1,0 +1,34 @@
+# Базовый образ - Ubuntu 22.04
+FROM ubuntu:22.04
+
+# Обновление пакетов и установка необходимых инструментов
+RUN apt-get update && \
+    apt-get install -y \
+    nginx \
+    openssh-server \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Создание пользователя для SSH и установка пароля
+RUN useradd -ms /bin/bash deploy && \
+    echo 'deploy:password' | chpasswd
+
+# Генерация ключей SSH для пользователя deploy
+RUN mkdir -p /home/deploy/.ssh && \
+    ssh-keygen -A && \
+    ssh-keygen -t rsa -N '' -f /home/deploy/.ssh/id_rsa && \
+    chown -R deploy:deploy /home/deploy/.ssh && \
+    chmod 700 /home/deploy/.ssh && \
+    chmod 600 /home/deploy/.ssh/*
+
+# Создание каталога для привилегий SSH
+RUN mkdir -p /var/run/sshd
+
+# Создание рабочей директории для nginx
+WORKDIR /var/www/html
+
+# Открытие портов для nginx и SSH
+EXPOSE 80 443 22
+
+# Запуск SSH-сервера и Nginx при старте контейнера
+CMD ["/bin/bash", "-c", "/usr/sbin/sshd -D & nginx -g 'daemon off;'"]
